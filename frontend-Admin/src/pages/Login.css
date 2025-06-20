@@ -1,0 +1,115 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e0e7ff 0%, #f4f7fa 50%, #c7d2fe 100%);
+}
+
+.login-box {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(80, 40, 180, 0.13), 0 2px 0 #eaeaea inset;
+  padding: 40px 32px 32px 32px;
+  min-width: 340px;
+  max-width: 95vw;
+  margin: 32px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid #042558;
+}
+
+.login-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 24px;
+}
+
+.login-lock-icon {
+  font-size: 3rem;
+  color: rgb(30, 41, 59);
+  display: block;
+  margin: 0 auto 16px auto;
+}
+
+.login-lock-icon.large {
+  font-size: 4.5rem;
+}
+
+.login-input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.login-input-icon {
+  font-size: 1.2rem;
+  color: #8a8a8a;
+  margin-right: 10px;
+}
+
+.login-input-icon.left {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  color: #8a8a8a;
+  pointer-events: none;
+}
+
+.login-input {
+  flex: 1;
+  padding: 10px 38px 10px 38px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+  background: #f9faff;
+}
+
+.login-eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  color: #8a8a8a;
+  cursor: pointer;
+}
+
+.login-forgot {
+  margin-top: 0;
+  margin-bottom: 12px;
+  text-align: right;
+}
+
+.forgot-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 0.98rem;
+  transition: text-decoration 0.2s;
+}
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+.login-button {
+  background: rgb(30, 41, 59);
+  color: #fff;
+  padding: 10px 0;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.login-button:hover {
+  background: #111827;
+}
