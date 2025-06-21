@@ -16,14 +16,15 @@ const AddEventForm = ({ onClose, onEventAdded, initialData }) => {
     venue: '',
     date: '',
     time: '',
-    totalSeats: 0,
-    availableSeats: 0,
+    totalSeats: '',
+    availableSeats: '',
     description: '',
     image: ''
   });
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [seatError, setSeatError] = useState('');
 
   useEffect(() => {
     if (initialData) {
@@ -33,8 +34,8 @@ const AddEventForm = ({ onClose, onEventAdded, initialData }) => {
         venue: initialData.venue || '',
         date: initialData.date ? initialData.date.slice(0, 10) : '', // Only YYYY-MM-DD
         time: initialData.time || '',
-        totalSeats: initialData.totalSeats || 0,
-        availableSeats: initialData.availableSeats || 0,
+        totalSeats: initialData.totalSeats || '',
+        availableSeats: initialData.availableSeats || '',
         description: initialData.description || '',
         image: initialData.image || ''
       });
@@ -46,8 +47,8 @@ const AddEventForm = ({ onClose, onEventAdded, initialData }) => {
         venue: '',
         date: '',
         time: '',
-        totalSeats: 0,
-        availableSeats: 0,
+        totalSeats: '',
+        availableSeats: '',
         description: '',
         image: ''
       });
@@ -57,7 +58,21 @@ const AddEventForm = ({ onClose, onEventAdded, initialData }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    let newForm = { ...form, [name]: value };
+    // Convert to numbers for seat fields
+    if (name === 'totalSeats' || name === 'availableSeats') {
+      newForm[name] = Number(value);
+    }
+    // Validation: totalSeats >= availableSeats
+    if (
+      (name === 'totalSeats' && Number(value) < Number(form.availableSeats)) ||
+      (name === 'availableSeats' && Number(form.totalSeats) < Number(value))
+    ) {
+      setSeatError('Total seats cannot be less than available seats.');
+    } else {
+      setSeatError('');
+    }
+    setForm(newForm);
   };
 
   const handleImageChange = (e) => {
@@ -166,6 +181,7 @@ const AddEventForm = ({ onClose, onEventAdded, initialData }) => {
                 type="number"
                 name="totalSeats"
                 value={form.totalSeats}
+                min={form.availableSeats}
                 onChange={handleChange}
                 required
               />
@@ -177,6 +193,7 @@ const AddEventForm = ({ onClose, onEventAdded, initialData }) => {
                 type="number"
                 name="availableSeats"
                 value={form.availableSeats}
+                max={form.totalSeats}
                 onChange={handleChange}
                 required
               />
@@ -212,11 +229,12 @@ const AddEventForm = ({ onClose, onEventAdded, initialData }) => {
             </div>
           </div>
           {error && <p style={{ color: 'red' }}>{error}</p>}
+          {seatError && <p style={{ color: 'red', gridColumn: 'span 2' }}>{seatError}</p>}
           <div className="modal-actions">
             <button
               className="modal-button primary"
               type="submit"
-              disabled={loading}
+              disabled={loading || !!seatError}
             >
               {initialData ? 'Update Event' : 'Create Event'}
             </button>
