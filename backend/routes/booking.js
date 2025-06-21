@@ -4,5 +4,6 @@ const bookingController = require('../Controllers/bookingController');
 const authenticateToken = require('../middleware/auth');
 
 router.get('/', authenticateToken, bookingController.getBookings);
+router.post('/', bookingController.createBooking);
 
 module.exports = router;

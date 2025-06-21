@@ -173,6 +173,21 @@ nav .logout-btn:hover {
   font-size: 15px;
 }
 
+.events-table td:nth-child(2) {
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.events-table tr:nth-child(n+3) td {
+  height: 32px;
+}
+
+.events-table tr:nth-child(-n+2) td {
+  height: 48px;
+}
+
 .events-table th:last-child, .events-table td:last-child {
   border-right: none;
 }

@@ -159,7 +159,7 @@ const AdminDashboard = () => {
                   {events.map((event) => (
                     <tr key={event.event_id}>
                       <td>{event.title}</td>
-                      <td>{event.description}</td>
+                      <td style={{ maxWidth: 180, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{event.description}</td>
                       <td>{event.date ? event.date.slice(0, 10) : ''}</td>
                       <td>{event.time}</td>
                       <td>{event.venue}</td>

@@ -58,6 +58,7 @@ nav a.active {
   -webkit-text-fill-color: initial;
   background-clip: initial;
   margin-bottom: 10px;
+  margin-top: 8px;
 }
 
 .hero h1 span {
@@ -154,11 +155,13 @@ nav a.active {
 }
 
 .seats-green {
-  color: green;
+  color: #22c55e !important;
+  font-weight: bold;
 }
 
 .seats-red {
-  color: red;
+  color: #ef4444 !important;
+  font-weight: bold;
 }
 
 .event-details button {
@@ -281,7 +284,7 @@ nav a.active {
 
 .footer {
   width: 100%;
-  background: linear-gradient(90deg, rgb(78, 2, 72) 0%, rgb(93, 5, 86) 100%);
+  background: linear-gradient(90deg, rgba(81, 3, 75, 0.448) 0%, rgb(98, 2, 90) 100%);
   color: #fff;
   padding: 32px 0 16px 0;
   margin-top: 48px;
