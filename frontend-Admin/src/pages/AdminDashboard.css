@@ -193,7 +193,7 @@ nav .logout-btn:hover {
 }
 
 .events-table th {
-  background: rgb(230, 237, 255);
+  background: rgb(217, 227, 250);
   font-weight: 700;
   color: #2861ad;
 }
@@ -215,7 +215,7 @@ nav .logout-btn:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #def0f9;
+  background: #d9f0ff;
   color: #22223b;
   padding: 16px 32px;
   font-size: 20px;

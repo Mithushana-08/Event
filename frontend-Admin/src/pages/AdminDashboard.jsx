@@ -16,7 +16,7 @@ const AdminDashboard = () => {
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [activeTab, setActiveTab] = useState('events');
   const [events, setEvents] = useState([]);
-  const [bookings] = useState(initialBookings);
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editEvent, setEditEvent] = useState(null);
@@ -40,8 +40,32 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchBookings = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/bookings');
+      if (!response.ok) throw new Error('Failed to fetch bookings');
+      const data = await response.json();
+      // Normalize Booking_id to booking_id for frontend compatibility
+      const normalized = Array.isArray(data)
+        ? data.map(b => ({
+            ...b,
+            booking_id: b.Booking_id, // always use Booking_id from backend
+            eventTitle: b.eventTitle || b.title || '',
+          }))
+        : [];
+      setBookings(normalized);
+    } catch (err) {
+      setError(err.message);
+      setBookings([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchEvents();
+    fetchBookings();
   }, []);
 
   const handleDelete = async (event_id) => {
@@ -207,29 +231,37 @@ const AdminDashboard = () => {
         )}
         {activeTab === 'bookings' && (
           <div className="dashboard-section">
-            <h2 className="section-title">Bookings</h2>
-            <table className="events-table">
-              <thead>
-                <tr>
-                  <th>Event</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Seats</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map((booking, idx) => (
-                  <tr key={idx}>
-                    <td>
-                      {events.find((e) => e.event_id === booking.event_id)?.title || 'Unknown Event'}
-                    </td>
-                    <td>{booking.name}</td>
-                    <td>{booking.email}</td>
-                    <td>{booking.seats}</td>
+            <h2 className="section-title">Booking Management</h2>
+            {loading ? (
+              <p>Loading bookings...</p>
+            ) : error ? (
+              <p style={{ color: 'red' }}>{error}</p>
+            ) : (
+              <table className="events-table">
+                <thead>
+                  <tr>
+                    <th>Event</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Seats</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {bookings.length === 0 ? (
+                    <tr><td colSpan="4" style={{textAlign:'center'}}>No bookings found.</td></tr>
+                  ) : (
+                    bookings.map((booking) => (
+                      <tr key={booking.booking_id}>
+                        <td>{booking.eventTitle}</td>
+                        <td>{booking.name}</td>
+                        <td>{booking.email}</td>
+                        <td>{booking.seats}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
       </div>
