@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './AdminDashboard.css';
 import AddEventForm from './AddEventForm';
-import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const initialBookings = [
   {
-    eventId: 1,
+    event_id: 1,
     name: 'Nimal Perera',
     email: 'nimal@example.com',
     seats: 3,
@@ -25,7 +25,11 @@ const AdminDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:5000/api/events');
+      const response = await fetch('http://localhost:5000/api/events', {
+        headers: {
+          Authorization: 'Bearer ' + (localStorage.getItem('token') || ''),
+        },
+      });
       if (!response.ok) throw new Error('Failed to fetch events');
       const data = await response.json();
       setEvents(data);
@@ -40,12 +44,14 @@ const AdminDashboard = () => {
     fetchEvents();
   }, []);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (event_id) => {
     if (!window.confirm('Are you sure you want to delete this event?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/events/${event_id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+        headers: {
+          Authorization: 'Bearer ' + (localStorage.getItem('token') || ''),
+        },
       });
       if (!res.ok) throw new Error('Failed to delete event');
       fetchEvents();
@@ -55,124 +61,178 @@ const AdminDashboard = () => {
   };
 
   const handleEdit = (event) => {
-    // Use local event data for editing, do not fetch from backend
-    setEditEvent(event);
+    setEditEvent({
+      event_id: event.event_id,
+      title: event.title,
+      venue: event.venue,
+      date: event.date,
+      time: event.time,
+      totalSeats: event.totalSeats,
+      availableSeats: event.availableSeats,
+      description: event.description,
+      image: event.image,
+      status: event.status,
+    });
     setShowAddEvent(true);
   };
 
-  const handleEventAdded = () => {
+  const handleEventAdded = (updatedEvent) => {
     fetchEvents();
     setEditEvent(null);
+    setShowAddEvent(false);
   };
 
   return (
-    <div className="dashboard-container">
-     
-      <div className="dashboard-stats">
-        <div className="stat-box blue-border">
-          <p>Total Events</p>
-          <p className="stat-value blue">0</p>
+    <div>
+      <nav className="admin-navbar">
+        <span className="admin-navbar-title">Admin Panel</span>
+        <button
+          className="admin-logout-button"
+          onClick={() => {
+            localStorage.removeItem('token');
+            window.location.href = '/';
+          }}
+        >
+          Logout
+        </button>
+      </nav>
+      <div className="dashboard-container">
+        <div className="dashboard-stats">
+          <div className="stat-box blue-border">
+            <p>Total Events</p>
+            <p className="stat-value blue">{events.length}</p>
+          </div>
+          <div className="stat-box green-border">
+            <p>Total Bookings</p>
+            <p className="stat-value green">{bookings.length}</p>
+          </div>
         </div>
-        <div className="stat-box green-border">
-          <p>Total Bookings</p>
-          <p className="stat-value green">0</p>
+        <div className="dashboard-tabs">
+          <button
+            className={`tab-button${activeTab === 'events' ? ' active' : ''}`}
+            onClick={() => setActiveTab('events')}
+          >
+            Event Management
+          </button>
+          <button
+            className={`tab-button${activeTab === 'bookings' ? ' active' : ''}`}
+            onClick={() => setActiveTab('bookings')}
+          >
+            Booking Management
+          </button>
         </div>
-        <div className="stat-box purple-border">
-          <p>Total Revenue</p>
-          <p className="stat-value purple">$0</p>
-        </div>
-      </div>
-      <div className="dashboard-tabs">
-        <button className={`tab-button${activeTab === 'events' ? ' active' : ''}`} onClick={() => setActiveTab('events')}>Event Management</button>
-        <button className={`tab-button${activeTab === 'bookings' ? ' active' : ''}`} onClick={() => setActiveTab('bookings')}>Booking Management</button>
-      </div>
-      {activeTab === 'events' && (
-        <div className="dashboard-section">
-          <h2 className="section-title">Events</h2>
-          {loading ? (
-            <p>Loading events...</p>
-          ) : error ? (
-            <p style={{ color: 'red' }}>{error}</p>
-          ) : (
+        {activeTab === 'events' && (
+          <div className="dashboard-section">
+            <h2 className="section-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Events</span>
+              <button
+                className="add-event-button"
+                style={{ marginBottom: 0 }}
+                onClick={() => {
+                  setShowAddEvent(true);
+                  setEditEvent(null);
+                }}
+              >
+                Add New Event
+              </button>
+            </h2>
+            {loading ? (
+              <p>Loading events...</p>
+            ) : error ? (
+              <p style={{ color: 'red' }}>{error}</p>
+            ) : (
+              <table className="events-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Venue</th>
+                    <th>Total Seats</th>
+                    <th>Available Seats</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {events.map((event) => (
+                    <tr key={event.event_id}>
+                      <td>{event.title}</td>
+                      <td>{event.description}</td>
+                      <td>{event.date ? event.date.slice(0, 10) : ''}</td>
+                      <td>{event.time}</td>
+                      <td>{event.venue}</td>
+                      <td>{event.totalSeats}</td>
+                      <td>{event.availableSeats}</td>
+                      <td>
+                        {event.image ? (
+                          <img
+                            src={event.image}
+                            alt="event"
+                            style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 4 }}
+                          />
+                        ) : (
+                          <span style={{ color: '#aaa' }}>No image</span>
+                        )}
+                      </td>
+                      <td>
+                        <FaEdit
+                          style={{ color: '#3b82f6', cursor: 'pointer', marginRight: 12 }}
+                          title="Edit"
+                          onClick={() => handleEdit(event)}
+                        />
+                        <FaTrash
+                          style={{ color: '#ef4444', cursor: 'pointer' }}
+                          title="Delete"
+                          onClick={() => handleDelete(event.event_id)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {showAddEvent && (
+              <AddEventForm
+                onClose={() => {
+                  setShowAddEvent(false);
+                  setEditEvent(null);
+                }}
+                onEventAdded={handleEventAdded}
+                initialData={editEvent}
+              />
+            )}
+          </div>
+        )}
+        {activeTab === 'bookings' && (
+          <div className="dashboard-section">
+            <h2 className="section-title">Bookings</h2>
             <table className="events-table">
               <thead>
                 <tr>
-                  <th>Title</th>
-                  <th>Description</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Venue</th>
-                  <th>Total Seats</th>
-                  <th>Available Seats</th>
-                  <th>Status</th>
-                  <th>Image</th>
-                  <th>Actions</th>
+                  <th>Event</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Seats</th>
                 </tr>
               </thead>
               <tbody>
-                {events.map(event => (
-                  <tr key={event.id}>
-                    <td>{event.title}</td>
-                    <td>{event.description}</td>
-                    <td>{event.date}</td>
-                    <td>{event.time}</td>
-                    <td>{event.venue}</td>
-                    <td>{event.totalSeats}</td>
-                    <td>{event.availableSeats}</td>
+                {bookings.map((booking, idx) => (
+                  <tr key={idx}>
                     <td>
-                      {event.status === 'Active' ? (
-                        <FaCheckCircle style={{ color: '#22c55e' }} title="Active" />
-                      ) : (
-                        <FaTimesCircle style={{ color: '#ef4444' }} title="Sold Out" />
-                      )}
+                      {events.find((e) => e.event_id === booking.event_id)?.title || 'Unknown Event'}
                     </td>
-                    <td>
-                      {event.image ? (
-                        <img src={event.image} alt="event" style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 4 }} />
-                      ) : (
-                        <span style={{ color: '#aaa' }}>No image</span>
-                      )}
-                    </td>
-                    <td>
-                      <FaEdit style={{ color: '#3b82f6', cursor: 'pointer', marginRight: 12 }} title="Edit" onClick={() => handleEdit(event)} />
-                      <FaTrash style={{ color: '#ef4444', cursor: 'pointer' }} title="Delete" onClick={() => handleDelete(event.id)} />
-                    </td>
+                    <td>{booking.name}</td>
+                    <td>{booking.email}</td>
+                    <td>{booking.seats}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          )}
-          <button className="add-event-button" onClick={() => { setShowAddEvent(true); setEditEvent(null); }}>Add New Event</button>
-          {showAddEvent && (
-            <AddEventForm onClose={() => { setShowAddEvent(false); setEditEvent(null); }} onEventAdded={handleEventAdded} initialData={editEvent} />
-          )}
-        </div>
-      )}
-      {activeTab === 'bookings' && (
-        <div className="dashboard-section">
-          <h2 className="section-title">Bookings</h2>
-          <table className="events-table">
-            <thead>
-              <tr>
-                <th>Event</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Seats</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((booking, idx) => (
-                <tr key={idx}>
-                  <td>{initialEvents.find(e => e.id === booking.eventId)?.title || 'Unknown Event'}</td>
-                  <td>{booking.name}</td>
-                  <td>{booking.email}</td>
-                  <td>{booking.seats}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

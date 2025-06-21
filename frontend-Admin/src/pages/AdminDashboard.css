@@ -52,14 +52,12 @@
 }
 
 .blue-border {
-  border-top: 6px solid #3b82f6;
+  border-top: 6px solid  #a21caf;
 }
 .green-border {
   border-top: 6px solid #22c55e;
 }
-.purple-border {
-  border-top: 6px solid #a21caf;
-}
+
 
 .stat-value {
   font-size: 24px;
@@ -67,7 +65,7 @@
 }
 
 .stat-value.blue {
-  color: #3b82f6;
+  color:#a21caf;
   font-size: 2.2rem;
   font-weight: bold;
 }
@@ -76,11 +74,7 @@
   font-size: 2.2rem;
   font-weight: bold;
 }
-.stat-value.purple {
-  color: #a21caf;
-  font-size: 2.2rem;
-  font-weight: bold;
-}
+
 
 .dashboard-tabs {
   display: flex;
@@ -106,7 +100,7 @@
 .tab-button:hover,
 .tab-button.active {
   background: rgb(230, 237, 255);
-  color: #3b82f6;
+  color: #093171;
   box-shadow: 0 8px 24px 0 rgba(80, 40, 180, 0.18), 0 4px 0 #eaeaea inset;
   transform: translateY(-2px) scale(1.03);
 }
@@ -200,4 +194,33 @@ nav .logout-btn:hover {
 .events-table svg {
   vertical-align: middle;
   font-size: 1.2rem;
+}
+
+.admin-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #def0f9;
+  color: #22223b;
+  padding: 16px 32px;
+  font-size: 20px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.admin-navbar-title {
+  letter-spacing: 1px;
+}
+.admin-logout-button {
+  background: #fb6c6c;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.admin-logout-button:hover {
+  background: #b91c1c;
 }

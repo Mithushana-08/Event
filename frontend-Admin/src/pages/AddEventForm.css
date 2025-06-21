@@ -9,22 +9,29 @@
 
 .modal-content {
   background-color: white;
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 384px;
+  padding: 40px 40px 32px 40px; /* Increased padding for a more spacious modal */
+  border-radius: 12px;
+  box-shadow: 0 8px 32px 0 rgba(60, 60, 120, 0.18), 0 2px 8px 0 rgba(0,0,0,0.08);
+  width: 380px; /* Reduced width for a more compact form */
+  border: 2.5px solid #e0e7ef;
+  /* 3D border effect */
+  outline: 3.5px solid #b6c6e6;
+  outline-offset: -7px;
 }
 
 .modal-title {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: bold;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
+  color: #0b3080;
+  text-align: center;
+  letter-spacing: 1px;
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 20px 28px; /* Increase horizontal gap between columns */
   margin-bottom: 24px;
 }
 
@@ -37,9 +44,11 @@
   margin-bottom: 4px;
 }
 
-.form-input {
+.form-input,
+textarea.form-input {
+  margin-bottom: 0;
+  padding: 10px 12px;
   width: 100%;
-  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -57,10 +66,10 @@
 }
 
 .modal-button.primary {
-  background-color: #3b82f6;
+  background-color: #154086;
   color: white;
 }
 
 .modal-button.secondary {
-  background-color: #d1d5db;
+  background-color: rgb(240, 67, 67);
 }
