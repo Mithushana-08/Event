@@ -212,7 +212,12 @@ nav a.active {
 
 .modal-content h2 {
   margin-bottom: 20px;
-  color: #333;
+  color: #fff;
+  background: linear-gradient(90deg, rgb(154, 49, 224), rgb(191, 44, 162), #cd2a8e, rgb(158, 58, 156), rgb(154, 59, 161), rgb(115, 74, 186), rgb(55, 94, 222));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
 }
 
 .modal-content form div {

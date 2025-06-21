@@ -49,8 +49,9 @@ function Home() {
     date: event.date && event.time ? `${event.date.slice(0, 10)} at ${event.time}` : event.date || '',
     location: event.venue,
     seats: event.availableSeats,
-    category: event.category || '', // Remove 'Other' fallback
+    category: event.category || '',
     image: event.image,
+    description: event.description // <-- add this line
   });
 
   // Map backend events to frontend format for display
@@ -157,7 +158,7 @@ function Home() {
                     onClick={() => handleBookNow(event)}
                     disabled={event.seats === 0 || isPastEvent(event)}
                   >
-                    Book Now
+                    View details & Book Now
                   </button>
                 </div>
               </div>
@@ -169,6 +170,11 @@ function Home() {
         <div className="modal">
           <div className="modal-content">
             <h2>Book for: {selectedEvent.name}</h2>
+            {selectedEvent.description && (
+              <div className="event-description" style={{marginBottom: '16px', color: '#444', fontSize: '1.05rem'}}>
+                <strong>Description:</strong> {selectedEvent.description}
+              </div>
+            )}
             <form onSubmit={handleFormSubmit}>
               <div>
                 <label>Name:</label>
