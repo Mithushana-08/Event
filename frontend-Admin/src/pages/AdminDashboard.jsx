@@ -1,43 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AdminDashboard.css';
 import AddEventForm from './AddEventForm';
 import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
-
-const initialEvents = [
-  {
-    id: 1,
-    title: 'Kandy Esala Perahera',
-    description: 'A grand cultural procession in Kandy, Sri Lanka.',
-    date: '2024-08-10',
-    time: '19:00',
-    venue: 'Kandy City Center, Kandy',
-    totalSeats: 2000,
-    availableSeats: 1500,
-    status: 'Active',
-  },
-  {
-    id: 2,
-    title: 'Colombo International Book Fair',
-    description: 'The largest annual book fair in Sri Lanka.',
-    date: '2024-09-15',
-    time: '10:00',
-    venue: 'BMICH, Colombo',
-    totalSeats: 5000,
-    availableSeats: 5000,
-    status: 'Active',
-  },
-  {
-    id: 3,
-    title: 'Galle Literary Festival',
-    description: 'Celebrating literature and arts in Galle.',
-    date: '2024-10-20',
-    time: '09:00',
-    venue: 'Galle Fort, Galle',
-    totalSeats: 1200,
-    availableSeats: 0,
-    status: 'Sold Out',
-  },
-];
 
 const initialBookings = [
   {
@@ -51,11 +15,54 @@ const initialBookings = [
 const AdminDashboard = () => {
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [activeTab, setActiveTab] = useState('events');
-  const [events, setEvents] = useState(initialEvents);
+  const [events, setEvents] = useState([]);
   const [bookings] = useState(initialBookings);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [editEvent, setEditEvent] = useState(null);
 
-  const handleDelete = (id) => {
-    setEvents(events.filter(event => event.id !== id));
+  const fetchEvents = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('http://localhost:5000/api/events');
+      if (!response.ok) throw new Error('Failed to fetch events');
+      const data = await response.json();
+      setEvents(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this event?')) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+      });
+      if (!res.ok) throw new Error('Failed to delete event');
+      fetchEvents();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleEdit = (event) => {
+    // Use local event data for editing, do not fetch from backend
+    setEditEvent(event);
+    setShowAddEvent(true);
+  };
+
+  const handleEventAdded = () => {
+    fetchEvents();
+    setEditEvent(null);
   };
 
   return (
@@ -82,47 +89,63 @@ const AdminDashboard = () => {
       {activeTab === 'events' && (
         <div className="dashboard-section">
           <h2 className="section-title">Events</h2>
-          <table className="events-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Venue</th>
-                <th>Total Seats</th>
-                <th>Available Seats</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {events.map(event => (
-                <tr key={event.id}>
-                  <td>{event.title}</td>
-                  <td>{event.description}</td>
-                  <td>{event.date}</td>
-                  <td>{event.time}</td>
-                  <td>{event.venue}</td>
-                  <td>{event.totalSeats}</td>
-                  <td>{event.availableSeats}</td>
-                  <td>
-                    {event.status === 'Active' ? (
-                      <FaCheckCircle style={{ color: '#22c55e' }} title="Active" />
-                    ) : (
-                      <FaTimesCircle style={{ color: '#ef4444' }} title="Sold Out" />
-                    )}
-                  </td>
-                  <td>
-                    <FaEdit style={{ color: '#3b82f6', cursor: 'pointer', marginRight: 12 }} title="Edit" />
-                    <FaTrash style={{ color: '#ef4444', cursor: 'pointer' }} title="Delete" onClick={() => handleDelete(event.id)} />
-                  </td>
+          {loading ? (
+            <p>Loading events...</p>
+          ) : error ? (
+            <p style={{ color: 'red' }}>{error}</p>
+          ) : (
+            <table className="events-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Venue</th>
+                  <th>Total Seats</th>
+                  <th>Available Seats</th>
+                  <th>Status</th>
+                  <th>Image</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <button className="add-event-button" onClick={() => setShowAddEvent(true)}>Add New Event</button>
-          {showAddEvent && <AddEventForm onClose={() => setShowAddEvent(false)} />}
+              </thead>
+              <tbody>
+                {events.map(event => (
+                  <tr key={event.id}>
+                    <td>{event.title}</td>
+                    <td>{event.description}</td>
+                    <td>{event.date}</td>
+                    <td>{event.time}</td>
+                    <td>{event.venue}</td>
+                    <td>{event.totalSeats}</td>
+                    <td>{event.availableSeats}</td>
+                    <td>
+                      {event.status === 'Active' ? (
+                        <FaCheckCircle style={{ color: '#22c55e' }} title="Active" />
+                      ) : (
+                        <FaTimesCircle style={{ color: '#ef4444' }} title="Sold Out" />
+                      )}
+                    </td>
+                    <td>
+                      {event.image ? (
+                        <img src={event.image} alt="event" style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 4 }} />
+                      ) : (
+                        <span style={{ color: '#aaa' }}>No image</span>
+                      )}
+                    </td>
+                    <td>
+                      <FaEdit style={{ color: '#3b82f6', cursor: 'pointer', marginRight: 12 }} title="Edit" onClick={() => handleEdit(event)} />
+                      <FaTrash style={{ color: '#ef4444', cursor: 'pointer' }} title="Delete" onClick={() => handleDelete(event.id)} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <button className="add-event-button" onClick={() => { setShowAddEvent(true); setEditEvent(null); }}>Add New Event</button>
+          {showAddEvent && (
+            <AddEventForm onClose={() => { setShowAddEvent(false); setEditEvent(null); }} onEventAdded={handleEventAdded} initialData={editEvent} />
+          )}
         </div>
       )}
       {activeTab === 'bookings' && (
